@@ -33,10 +33,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
                         shadow="xl"
                         p="xl"
                         radius="lg"
-                        style={{
-                            backdropFilter: 'blur(10px)',
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                        }}
+                        withBorder
                     >
                         {children}
                     </Paper>

@@ -9,14 +9,9 @@ import { ResetPasswordPage } from '@/components/pages/auth/ResetPasswordPage';
 import { ProfilePage } from '@/components/pages/dashboard/ProfilePage';
 import { SettingsPage } from '@/components/pages/dashboard/SettingsPage';
 import { Container, Text, Paper, Stack } from '@mantine/core';
-import { QueryClient } from '@tanstack/react-query';
-
-interface RouterContext {
-    queryClient: QueryClient
-}
 
 // Root Route
-const rootRoute = createRootRouteWithContext<RouterContext>()({
+const rootRoute = createRootRouteWithContext<{}>()({
     component: () => <Outlet />,
 });
 
@@ -118,9 +113,6 @@ const routeTree = rootRoute.addChildren([indexRoute, dashboardRoute, authRoute])
 
 export const router = createRouter({
     routeTree,
-    context: {
-        queryClient: undefined! as QueryClient,
-    },
 });
 
 declare module '@tanstack/react-router' {
