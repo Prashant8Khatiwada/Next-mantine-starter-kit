@@ -10,7 +10,7 @@ import { queryClient } from '@/api/queryClient';
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <QueryClientProvider client={queryClient}>
-            <MantineProvider theme={theme} defaultColorScheme="light">
+            <MantineProvider theme={theme} defaultColorScheme="auto">
                 {children}
                 <Toaster position="top-right" />
             </MantineProvider>

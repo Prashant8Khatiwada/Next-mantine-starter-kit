@@ -1,11 +1,15 @@
-import { createRouter, createRootRouteWithContext, createRoute, Outlet, Link } from '@tanstack/react-router';
+import { createRouter, createRootRouteWithContext, createRoute, Outlet } from '@tanstack/react-router';
 import { HomePage } from '@/components/pages/HomePage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
-import { Container, Text, Button, Stack, TextInput, PasswordInput, Paper } from '@mantine/core';
-import { QueryClient, queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { api } from '@/api/api-client';
-import { Post } from '@/services/posts';
+import { LoginPage } from '@/components/pages/auth/LoginPage';
+import { RegisterPage } from '@/components/pages/auth/RegisterPage';
+import { ForgotPasswordPage } from '@/components/pages/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/components/pages/auth/ResetPasswordPage';
+import { ProfilePage } from '@/components/pages/dashboard/ProfilePage';
+import { SettingsPage } from '@/components/pages/dashboard/SettingsPage';
+import { Container, Text, Paper, Stack } from '@mantine/core';
+import { QueryClient } from '@tanstack/react-query';
 
 interface RouterContext {
     queryClient: QueryClient
@@ -27,17 +31,20 @@ const indexRoute = createRoute({
 const dashboardRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: 'dashboard',
-    component: DashboardLayout,
+    component: () => <DashboardLayout><Outlet /></DashboardLayout>,
 });
 
-const postsQueryOptions = queryOptions({
-    queryKey: ['posts'],
-    queryFn: () => api.get<Post[]>('/posts'),
-});
+// Mock data for dashboard - replace with real API calls in production
+const mockPosts = [
+    { id: 1, title: 'Welcome to your dashboard', body: 'This is a sample post. Replace this with real data from your API.' },
+    { id: 2, title: 'Getting started', body: 'Explore the sidebar to navigate between different sections of your dashboard.' },
+    { id: 3, title: 'Customize your experience', body: 'Visit the Settings page to configure your preferences and appearance.' },
+    { id: 4, title: 'Your profile', body: 'Update your profile information in the Profile section.' },
+];
 
 function DashboardIndex() {
-    const postsQuery = useSuspenseQuery(postsQueryOptions);
-    const posts = postsQuery.data;
+    // Using mock data instead of API call for starter kit
+    const posts = mockPosts;
 
     return (
         <Container>
@@ -57,33 +64,55 @@ function DashboardIndex() {
 const dashboardIndexRoute = createRoute({
     getParentRoute: () => dashboardRoute,
     path: '/',
-    loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(postsQueryOptions),
     component: DashboardIndex,
 });
 
-dashboardRoute.addChildren([dashboardIndexRoute]);
+const dashboardProfileRoute = createRoute({
+    getParentRoute: () => dashboardRoute,
+    path: 'profile',
+    component: ProfilePage,
+});
+
+const dashboardSettingsRoute = createRoute({
+    getParentRoute: () => dashboardRoute,
+    path: 'settings',
+    component: SettingsPage,
+});
+
+dashboardRoute.addChildren([dashboardIndexRoute, dashboardProfileRoute, dashboardSettingsRoute]);
 
 // Auth Route
 const authRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: 'auth',
-    component: AuthLayout,
+    component: () => <AuthLayout><Outlet /></AuthLayout>,
 });
 
 const loginRoute = createRoute({
     getParentRoute: () => authRoute,
     path: 'login',
-    component: () => (
-        <Stack>
-            <Text size="xl" fw={700} ta="center">Welcome Back</Text>
-            <TextInput label="Email" placeholder="hello@example.com" />
-            <PasswordInput label="Password" placeholder="Your password" />
-            <Button component={Link} to="/dashboard" fullWidth mt="md" variant="filled">Sign In</Button>
-        </Stack>
-    ),
+    component: LoginPage,
 });
 
-authRoute.addChildren([loginRoute]);
+const registerRoute = createRoute({
+    getParentRoute: () => authRoute,
+    path: 'register',
+    component: RegisterPage,
+});
+
+const forgotPasswordRoute = createRoute({
+    getParentRoute: () => authRoute,
+    path: 'forgot-password',
+    component: ForgotPasswordPage,
+});
+
+const resetPasswordRoute = createRoute({
+    getParentRoute: () => authRoute,
+    path: 'reset-password',
+    component: ResetPasswordPage,
+});
+
+authRoute.addChildren([loginRoute, registerRoute, forgotPasswordRoute, resetPasswordRoute]);
 
 const routeTree = rootRoute.addChildren([indexRoute, dashboardRoute, authRoute]);
 
